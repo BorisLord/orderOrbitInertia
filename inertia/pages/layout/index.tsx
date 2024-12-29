@@ -4,12 +4,12 @@ import Footer from './Footer'
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="">
+    <div className="h-screen flex flex-col">
       {/* Header */}
       <Header />
 
       {/* Main Content */}
-      <main className="">{children}</main>
+      <main className="flex-1 overflow-hidden">{children}</main>
 
       {/* Footer */}
       <Footer />

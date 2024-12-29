@@ -22,8 +22,8 @@ const Header: React.FC = () => {
           </h1>
         </div>
         <nav>
-          <Link href="/trading-pairs" className="mr-4">
-            Pairs
+          <Link href="/register" className="mr-4">
+            Register
           </Link>
           {/* {user ? (
             <>
