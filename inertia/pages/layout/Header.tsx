@@ -22,8 +22,11 @@ const Header: React.FC = () => {
           </h1>
         </div>
         <nav>
-          <Link href="/register" className="mr-4">
+          <Link href="/users/register" className="mr-4">
             Register
+          </Link>
+          <Link href="/users/login" className="mr-4">
+            Login
           </Link>
           {/* {user ? (
             <>
