@@ -4,6 +4,22 @@ export const registerSchema = vine.compile(
   vine.object({
     email: vine.string().email().unique({ table: 'users', column: 'email' }),
     username: vine.string().trim().minLength(3).maxLength(255),
-    password: vine.string().minLength(8).maxLength(255).confirmed(),
+    password: vine
+      .string()
+      .minLength(12)
+      .maxLength(255)
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/)
+      .confirmed(),
   })
 )
+
+// export const loginSchema = vine.compile(
+//   vine.object({
+//     email: vine.string().email(),
+//     password: vine
+//       .string()
+//       .minLength(12)
+//       .maxLength(255)
+//       .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/),
+//   })
+// )

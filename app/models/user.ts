@@ -19,6 +19,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column()
   declare email: string
 
+  @column()
+  public isAdmin: boolean = false
+
   @column({ serializeAs: null })
   declare password: string
 
@@ -28,3 +31,5 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }
+
+export type { User }
