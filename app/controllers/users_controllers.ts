@@ -3,9 +3,9 @@ import { registerSchema } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class UsersController {
-  async index({ inertia }: HttpContext) {
+  // All Users listing, setup to only admin
+  public async index({ inertia }: HttpContext) {
     const users = await User.all()
-
     return inertia.render('users/index', { users })
   }
 
@@ -26,7 +26,6 @@ export default class UsersController {
       session.flash({ errors: error.messages })
       return response.redirect('back')
       // const formattedErrors = error.messages.map((err: Error) => err.message)
-
       // session.flash({ errors: formattedErrors })
       // return response.redirect('back')
     }
@@ -44,10 +43,27 @@ export default class UsersController {
       await auth.use('web').login(user)
 
       // Redirige vers une page protégée
-      // ! Change redirection
+      // ! Change redirection or not ?
       response.redirect('users/dashboard')
     } catch {
       return response.badRequest({ message: 'Invalid credentials' })
     }
+  }
+
+  public async getUserData({ auth, inertia }: HttpContext) {
+    // Récupérer l'utilisateur connecté
+    const user = auth.user
+
+    if (!user) {
+      throw new Error('User not authenticated')
+    }
+
+    // Rendre la vue avec les données utilisateur
+    return inertia.render('users/Dashboard', {
+      user: {
+        username: user.username,
+        email: user.email,
+      },
+    })
   }
 }

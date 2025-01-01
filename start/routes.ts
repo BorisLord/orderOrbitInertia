@@ -29,10 +29,9 @@ router.get('users/login', async ({ inertia }) => {
 })
 
 router
-  .get('users/dashboard', async ({ inertia }) => {
-    return inertia.render('users/Dashboard')
-  })
+  .get('users/dashboard', [UsersController, 'getUserData'])
   .use(middleware.auth())
+  .as('users.dashboard')
 
 // ! Protect This Route to admin only
 router.get('users/index', [UsersController, 'index'])
