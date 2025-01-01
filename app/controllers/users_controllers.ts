@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import User from '#models/user'
 import { registerSchema } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -65,5 +66,10 @@ export default class UsersController {
         email: user.email,
       },
     })
+  }
+  public async logout({ auth, inertia }: HttpContext) {
+    await auth.use('web').logout()
+    console.log('in LOGOUT control tower break')
+    return inertia.render('/')
   }
 }

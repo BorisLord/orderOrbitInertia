@@ -33,6 +33,8 @@ router
   .use(middleware.auth())
   .as('users.dashboard')
 
+router.post('/logout', [UsersController, 'logout']).use(middleware.auth()).as('users.logout')
+
 // ! Protect This Route to admin only
 router.get('users/index', [UsersController, 'index'])
 

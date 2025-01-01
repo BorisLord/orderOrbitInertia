@@ -1,14 +1,15 @@
-import { Link } from '@inertiajs/react'
+import { Link, router } from '@inertiajs/react'
 import React from 'react'
 
 const Header: React.FC = () => {
   // const { user, logout } = useUser();
   // const navigate = useNavigate();
 
-  // const handleLogout = () => {
-  //   logout();
-  //   navigate('/login');
-  // };
+  const handleLogout = () => {
+    // e.preventDefault()
+    console.log('befor POST BB')
+    router.post('/logout')
+  }
 
   return (
     <header className="bg-gray-800 text-white p-4">
@@ -28,6 +29,12 @@ const Header: React.FC = () => {
           <Link href="/users/login" className="mr-4">
             Login
           </Link>
+          <Link href="/users/dashboard" className="mr-4">
+            Dashboard
+          </Link>
+          <a href="/" onClick={handleLogout} className="mr-4">
+            Logout
+          </a>
           {/* {user ? (
             <>
               <Link to='/profile' className='mr-4'>
