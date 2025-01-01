@@ -1,14 +1,15 @@
 import { Link, router } from '@inertiajs/react'
 import React from 'react'
+import { useUser } from '../../UserContext'
 
 const Header: React.FC = () => {
-  // const { user, logout } = useUser();
-  // const navigate = useNavigate();
+  const { user, setUser } = useUser()
 
   const handleLogout = () => {
     // e.preventDefault()
     console.log('befor POST BB')
     router.post('/logout')
+    setUser(null)
   }
 
   return (
@@ -23,37 +24,25 @@ const Header: React.FC = () => {
           </h1>
         </div>
         <nav>
-          <Link href="/users/register" className="mr-4">
-            Register
-          </Link>
-          <Link href="/users/login" className="mr-4">
-            Login
-          </Link>
-          <Link href="/users/dashboard" className="mr-4">
-            Dashboard
-          </Link>
-          <a href="/" onClick={handleLogout} className="mr-4">
-            Logout
-          </a>
-          {/* {user ? (
+          {user ? (
             <>
-              <Link to='/profile' className='mr-4'>
+              <Link href="/users/dashboard" className="mr-4">
                 <span>{user.username}</span>
               </Link>
-              <button onClick={handleLogout} className='mr-4'>
+              <a href="/" onClick={handleLogout} className="mr-4">
                 Logout
-              </button>
+              </a>
             </>
           ) : (
             <>
-              <Link to='/login' className='mr-4'>
-                Login
-              </Link>
-              <Link to='/register' className='mr-4'>
+              <Link href="/users/register" className="mr-4">
                 Register
               </Link>
+              <Link href="/users/login" className="mr-4">
+                Login
+              </Link>
             </>
-          )} */}
+          )}
         </nav>
       </div>
     </header>

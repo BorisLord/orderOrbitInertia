@@ -1,4 +1,4 @@
-import { Head, usePage, router } from '@inertiajs/react'
+import { Head, router } from '@inertiajs/react'
 import Layout from '../layout'
 import { useState } from 'react'
 

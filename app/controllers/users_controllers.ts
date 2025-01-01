@@ -7,6 +7,7 @@ export default class UsersController {
   // All Users listing, setup to only admin
   public async index({ inertia }: HttpContext) {
     const users = await User.all()
+
     return inertia.render('users/index', { users })
   }
 
@@ -64,6 +65,8 @@ export default class UsersController {
       user: {
         username: user.username,
         email: user.email,
+        createdAt: user.createdAt,
+        isAdmin: user.isAdmin,
       },
     })
   }

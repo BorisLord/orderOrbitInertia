@@ -5,6 +5,7 @@ import '../css/app.css'
 import { createRoot } from 'react-dom/client'
 import { createInertiaApp } from '@inertiajs/react'
 import { resolvePageComponent } from '@adonisjs/inertia/helpers'
+import { UserProvider } from '../UserContext' // Import du UserProvider
 
 const appName = import.meta.env.VITE_APP_NAME || 'AdonisJS'
 
@@ -18,6 +19,10 @@ createInertiaApp({
   },
 
   setup({ el, App, props }) {
-    createRoot(el).render(<App {...props} />)
+    createRoot(el).render(
+      <UserProvider>
+        <App {...props} />
+      </UserProvider>
+    )
   },
 })

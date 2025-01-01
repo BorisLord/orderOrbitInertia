@@ -1,11 +1,13 @@
 import { useState } from 'react'
-// import { useUser } from '../../contexts/useUser'
+import { useUser } from '../../UserContext'
 import { Head, Link, router } from '@inertiajs/react'
 import Layout from '../layout'
+import type { User } from '#models/user'
 
 const LoginPage = () => {
   const [form, setForm] = useState({ email: '', password: '' })
   const [isLoading, setIsLoading] = useState(false)
+  const { setUser } = useUser()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -13,7 +15,16 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    router.post('/login_user', form)
+    router.post('/login_user', form, {
+      onSuccess: (page) => {
+        // Récupérer les données utilisateur depuis les props Inertia
+        const user = page.props.user
+        setUser(user as User) // Mettre à jour le contexte utilisateur
+      },
+      onError: (errors) => {
+        console.error('Login failed:', errors)
+      },
+    })
   }
 
   return (
