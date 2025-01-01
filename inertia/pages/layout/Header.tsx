@@ -7,7 +7,6 @@ const Header: React.FC = () => {
 
   const handleLogout = () => {
     // e.preventDefault()
-    console.log('befor POST BB')
     router.post('/logout')
     setUser(null)
   }

@@ -7,7 +7,6 @@ interface UsersProps {
 }
 
 const Users = ({ users }: UsersProps) => {
-  console.log('USERS LOOSERS', users)
   return (
     <>
       <Head title="Users" />

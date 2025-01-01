@@ -22,7 +22,6 @@ export default function Register() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log(form)
     // Envoyer les données au backend via Inertia.js
     router.post('/create_users', form)
   }

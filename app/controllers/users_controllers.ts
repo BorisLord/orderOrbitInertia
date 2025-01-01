@@ -14,7 +14,6 @@ export default class UsersController {
   public async store({ request, response, session }: HttpContext) {
     try {
       const data = await request.validateUsing(registerSchema)
-      console.log('DATA', data)
       await User.create({
         email: data.email,
         username: data.username,
@@ -24,7 +23,6 @@ export default class UsersController {
       session.flash({ success: 'Registration successful!' })
       return response.redirect('/')
     } catch (error) {
-      console.log('ERROR', error)
       session.flash({ errors: error.messages })
       return response.redirect('back')
       // const formattedErrors = error.messages.map((err: Error) => err.message)
@@ -34,7 +32,6 @@ export default class UsersController {
   }
 
   public async login({ request, auth, response }: HttpContext) {
-    console.log('IN LOGIN CONTROLLER')
     const { email, password } = request.only(['email', 'password'])
 
     try {
@@ -72,7 +69,6 @@ export default class UsersController {
   }
   public async logout({ auth, inertia }: HttpContext) {
     await auth.use('web').logout()
-    console.log('in LOGOUT control tower break')
     return inertia.render('/')
   }
 }
