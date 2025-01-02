@@ -2,6 +2,10 @@
 import User from '#models/user'
 import { registerSchema } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
+import ccxt from 'ccxt'
+// import ExchangesController from './exchanges_controller.js'
+
+const ExchangesController = () => import('#controllers/exchanges_controller')
 
 export default class UsersController {
   // All Users listing, setup to only admin
@@ -57,16 +61,14 @@ export default class UsersController {
       throw new Error('User not authenticated')
     }
 
+    const exchangesList = ccxt.exchanges
+
     // Rendre la vue avec les données utilisateur
     return inertia.render('users/Dashboard', {
-      user: {
-        username: user.username,
-        email: user.email,
-        createdAt: user.createdAt,
-        isAdmin: user.isAdmin,
-      },
+      exchangesList,
     })
   }
+
   public async logout({ auth, inertia }: HttpContext) {
     await auth.use('web').logout()
     return inertia.render('/')
