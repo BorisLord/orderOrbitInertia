@@ -1,8 +1,10 @@
 import { DateTime } from 'luxon'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, beforeCreate, column, hasMany } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
+import type { HasMany } from '@adonisjs/lucid/types/relations'
+import ApiKey from './api_key.js'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -12,6 +14,9 @@ const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
 export default class User extends compose(BaseModel, AuthFinder) {
   @column({ isPrimary: true })
   declare id: number
+
+  @column()
+  declare userUuid: string
 
   @column()
   declare username: string
@@ -30,6 +35,14 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+
+  @hasMany(() => ApiKey)
+  declare apiKeys: HasMany<typeof ApiKey>
+
+  @beforeCreate()
+  static async assignUuid(user: User) {
+    user.userUuid = crypto.randomUUID()
+  }
 }
 
 export type { User }
