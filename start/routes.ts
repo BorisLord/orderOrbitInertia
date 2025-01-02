@@ -44,3 +44,5 @@ router.post('/create_users', [UsersController, 'store']).as('users.store')
 // Login d'un utilisateur
 router.post('/login_user', [UsersController, 'login'])
 // .as('user_login')
+
+// router.post('users/addApiKey', UsersController, 'addApiKey').use(middleware.auth())
