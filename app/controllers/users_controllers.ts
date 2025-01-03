@@ -3,9 +3,7 @@ import User from '#models/user'
 import { registerSchema } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
 import ccxt from 'ccxt'
-// import ExchangesController from './exchanges_controller.js'
-
-const ExchangesController = () => import('#controllers/exchanges_controller')
+import ApiKey from '#models/api_key'
 
 export default class UsersController {
   // All Users listing, setup to only admin
@@ -48,7 +46,7 @@ export default class UsersController {
       // Redirige vers une page protégée
       // ! Change redirection or not ?
       response.redirect('users/dashboard')
-    } catch {
+    } catch (error) {
       return response.badRequest({ message: 'Invalid credentials' })
     }
   }
@@ -60,17 +58,30 @@ export default class UsersController {
     if (!user) {
       throw new Error('User not authenticated')
     }
+    // console.log('user pas lol', user)
 
     const exchangesList = ccxt.exchanges
+    // console.log('UserShitStory', user.id)
+    const apiKeys = await ApiKey.query()
+      .where('user_id', user.id)
+      .select('exchangeId', 'apiKey', 'createdAt')
 
     // Rendre la vue avec les données utilisateur
     return inertia.render('users/Dashboard', {
+      apiKeys,
       exchangesList,
+      user: {
+        username: user.username,
+        email: user.email,
+        createdAt: user.createdAt,
+        isAdmin: user.isAdmin,
+        uuid: user.userUuid,
+      },
     })
   }
 
-  public async logout({ auth, inertia }: HttpContext) {
+  async logout({ auth, response }: HttpContext) {
     await auth.use('web').logout()
-    return inertia.render('/')
+    return response.redirect('/')
   }
 }
