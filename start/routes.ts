@@ -11,7 +11,8 @@ import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 
 const UsersController = () => import('#controllers/users_controllers')
-const ExchangesController = () => import('#controllers/exchanges_controller')
+const ApiKeysController = () => import('#controllers/api_keys_controller')
+// const ExchangesController = () => import('#controllers/exchanges_controller')
 
 // Page d'accueil
 router.get('/', async ({ inertia }) => {
@@ -34,7 +35,7 @@ router
   .use(middleware.auth())
   .as('users.dashboard')
 
-router.post('/logout', [UsersController, 'logout']).use(middleware.auth()).as('users.logout')
+router.post('/logout', [UsersController, 'logout']).use(middleware.auth())
 
 // ! Protect This Route to admin only
 router.get('users/index', [UsersController, 'index'])
@@ -48,4 +49,5 @@ router.post('/login_user', [UsersController, 'login'])
 
 // router.get('/exchanges', [ExchangesController, 'listExchanges']).as('exchanges')
 
-// router.post('users/addApiKey', UsersController, 'addApiKey').use(middleware.auth())
+router.post('/addApiKey', [ApiKeysController, 'store']).use(middleware.auth())
+router.post('/deleteApiKey', [ApiKeysController, 'delete']).use(middleware.auth())
