@@ -10,6 +10,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined)
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUserState] = useState<User | null>(null)
+  // console.log('UserCOntext', user)
 
   // Fonction pour mettre à jour l'utilisateur et sauvegarder dans le Local Storage
   const setUser = (user: User | null) => {
