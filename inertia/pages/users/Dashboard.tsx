@@ -1,8 +1,8 @@
 import Layout from '../layout'
-import { Head } from '@inertiajs/react'
-import { useUser } from '../../UserContext'
+import { Head, router, usePage } from '@inertiajs/react'
+import { useUser } from '../../context/UserContext'
 import { DateTime } from 'luxon'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { ApiKeyPick } from '#models/api_key'
 
 function formatDate(date: string | Date | DateTime<boolean> | null | undefined): string {
@@ -16,8 +16,16 @@ function formatDate(date: string | Date | DateTime<boolean> | null | undefined):
 
 const initApiKey = { apiKey: '', secret: '', exchangeId: '' }
 
-const DashboardPage = ({ exchangesList }: { exchangesList: string[] }) => {
+type ApiKeyPickWithId = ApiKeyPick & { id: number; createdAt: DateTime }
+
+const DashboardPage = () => {
+  const { apiKeys, exchangesList } = usePage().props as unknown as {
+    apiKeys: ApiKeyPickWithId[]
+    exchangesList: string[]
+  }
+
   const { user } = useUser()
+  console.log('APIKEYINFRONT', apiKeys)
 
   // console.log('EXCHGES', exchangesList)
 
@@ -37,6 +45,13 @@ const DashboardPage = ({ exchangesList }: { exchangesList: string[] }) => {
       }))
     }
 
+  const handleDelete = (id: number) => {
+    console.log('ON DELETE TO SETUP BRUH', id)
+    if (confirm('Are you sure you want to delete this key?')) {
+      router.post('/deleteApiKey', { id })
+    }
+  }
+
   // Gérer la soumission de la clé API
   const handleAddApiKey = async () => {
     if (!newApiKey) {
@@ -44,9 +59,8 @@ const DashboardPage = ({ exchangesList }: { exchangesList: string[] }) => {
       return
     }
     try {
-      // Envoyer la clé au backend
-      // await axios.post('/users/addApiKey', { apiKey: newApiKey })
-      console.log('APIKEYSENDED TO ZE MOON', newApiKey)
+      router.post('/addApiKey', newApiKey)
+      // console.log('APIKEYSENDED TO ZE MOON', newApiKey)
       setMessage('Clé API ajoutée avec succès.')
       setNewApiKey(initApiKey)
       setIsAddingKey(false) // Masquer le champ
@@ -69,6 +83,34 @@ const DashboardPage = ({ exchangesList }: { exchangesList: string[] }) => {
             Your email: <span className="font-medium">{user?.email}</span>
           </p>
 
+          <h2 className="text-xl font-bold mt-6">Your API Keys</h2>
+          <table className="border-collapse border border-gray-300 w-full mt-4">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border border-gray-300 px-4 py-2">Exchange</th>
+                <th className="border border-gray-300 px-4 py-2">Public API Key</th>
+                <th className="border border-gray-300 px-4 py-2">Add date</th>
+                <th className="border border-gray-300 px-4 py-2">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {apiKeys.map((key) => (
+                <tr key={key.exchangeId} className="hover:bg-gray-50">
+                  <td className="border border-gray-300 px-4 py-2">{key.exchangeId}</td>
+                  <td className="border border-gray-300 px-4 py-2">{key.apiKey}</td>
+                  <td className="border border-gray-300 px-4 py-2">{formatDate(key.createdAt)}</td>
+                  <td className="border border-gray-300 px-4 py-2 text-center">
+                    <button
+                      onClick={() => handleDelete(key.id)}
+                      className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                    >
+                      Delete Key
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
           {/* Gestion des clés API */}
           <div className="mt-6">
             <h2 className="text-xl font-bold">Manage API Keys</h2>
