@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useUser } from '../../UserContext'
+import { useUser } from '../../context/UserContext'
 import { Head, Link, router } from '@inertiajs/react'
 import Layout from '../layout'
 import type { User } from '#models/user'

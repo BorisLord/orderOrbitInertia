@@ -83,3 +83,5 @@ export default class ApiKey extends BaseModel {
 type ApiKeyPick = Pick<ApiKey, 'exchangeId' | 'apiKey' | 'secret' | 'uid' | 'password'>
 
 export type { ApiKeyPick }
+
+export type { ApiKey }

@@ -5,7 +5,7 @@ import '../css/app.css'
 import { createRoot } from 'react-dom/client'
 import { createInertiaApp } from '@inertiajs/react'
 import { resolvePageComponent } from '@adonisjs/inertia/helpers'
-import { UserProvider } from '../UserContext' // Import du UserProvider
+import { UserProvider } from '../context/UserContext' // Import du UserProvider
 
 const appName = import.meta.env.VITE_APP_NAME || 'AdonisJS'
 

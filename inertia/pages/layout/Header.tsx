@@ -1,6 +1,6 @@
 import { Link, router } from '@inertiajs/react'
 import React from 'react'
-import { useUser } from '../../UserContext'
+import { useUser } from '../../context/UserContext'
 
 const Header: React.FC = () => {
   const { user, setUser } = useUser()
