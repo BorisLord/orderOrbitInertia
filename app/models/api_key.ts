@@ -7,10 +7,10 @@ import {
   belongsTo,
   column,
 } from '@adonisjs/lucid/orm'
-import hash from '@adonisjs/core/services/hash'
 import User from './user.js'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import ApiKeyAudit from './api_key_audit.js'
+import encryption from '@adonisjs/core/services/encryption'
 
 export default class ApiKey extends BaseModel {
   @column({ isPrimary: true })
@@ -46,15 +46,15 @@ export default class ApiKey extends BaseModel {
   // Hook pour hasher secret et password avant de sauvegarder
   @beforeSave()
   static async hashSensitiveData(apiKey: ApiKey) {
-    // Hacher `secret` si modifié
+    // Encrypt `secret` si modifié
     if (apiKey.$dirty.secret) {
-      apiKey.secret = await hash.make(apiKey.secret)
+      apiKey.secret = encryption.encrypt(apiKey.secret)
     }
 
-    // Hacher `password` si modifié
+    // Encrypt `password` si modifié
     if (apiKey.password) {
       if (apiKey.$dirty.password) {
-        apiKey.password = await hash.make(apiKey.password)
+        apiKey.password = encryption.encrypt(apiKey.password)
       }
     }
   }

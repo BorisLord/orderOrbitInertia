@@ -46,7 +46,14 @@ export default class UsersController {
       // Redirige vers une page protégée
       // ! Change redirection or not ?
       response.redirect('users/dashboard')
+
+      // Need return a json for apiTesting
+      // return response.json({
+      // message: 'Login successful',
+      // user,
+      // })
     } catch (error) {
+      console.log(error)
       return response.badRequest({ message: 'Invalid credentials' })
     }
   }
@@ -64,7 +71,7 @@ export default class UsersController {
     // console.log('UserShitStory', user.id)
     const apiKeys = await ApiKey.query()
       .where('user_id', user.id)
-      .select('exchangeId', 'apiKey', 'createdAt')
+      .select('exchangeId', 'apiKey', 'createdAt', 'id')
 
     // Rendre la vue avec les données utilisateur
     return inertia.render('users/Dashboard', {
