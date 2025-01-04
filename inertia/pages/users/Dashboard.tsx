@@ -25,7 +25,7 @@ const DashboardPage = () => {
   }
 
   const { user } = useUser()
-  console.log('APIKEYINFRONT', apiKeys)
+  // console.log('APIKEYINFRONT', apiKeys)
 
   // console.log('EXCHGES', exchangesList)
 
@@ -83,6 +83,13 @@ const DashboardPage = () => {
             Your email: <span className="font-medium">{user?.email}</span>
           </p>
 
+          <button
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            onClick={() => router.get('/accounts')}
+          >
+            Check Accounts
+          </button>
+
           <h2 className="text-xl font-bold mt-6">Your API Keys</h2>
           <table className="border-collapse border border-gray-300 w-full mt-4">
             <thead>
@@ -97,7 +104,9 @@ const DashboardPage = () => {
               {apiKeys.map((key) => (
                 <tr key={key.exchangeId} className="hover:bg-gray-50">
                   <td className="border border-gray-300 px-4 py-2">{key.exchangeId}</td>
-                  <td className="border border-gray-300 px-4 py-2">{key.apiKey}</td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {key.apiKey.slice(0, 6)} **** {key.apiKey.slice(-6)}
+                  </td>
                   <td className="border border-gray-300 px-4 py-2">{formatDate(key.createdAt)}</td>
                   <td className="border border-gray-300 px-4 py-2 text-center">
                     <button
