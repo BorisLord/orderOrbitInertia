@@ -12,7 +12,7 @@ import { middleware } from '#start/kernel'
 
 const UsersController = () => import('#controllers/users_controllers')
 const ApiKeysController = () => import('#controllers/api_keys_controller')
-// const ExchangesController = () => import('#controllers/exchanges_controller')
+const ExchangesController = () => import('#controllers/exchanges_controller')
 
 // Page d'accueil
 router.get('/', async ({ inertia }) => {
@@ -51,3 +51,5 @@ router.post('/login_user', [UsersController, 'login'])
 
 router.post('/addApiKey', [ApiKeysController, 'store']).use(middleware.auth())
 router.post('/deleteApiKey', [ApiKeysController, 'delete']).use(middleware.auth())
+
+router.get('/accounts', [ExchangesController, 'getBalances']).use(middleware.auth())
