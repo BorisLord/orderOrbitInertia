@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import ApiKey from '#models/api_key'
 import encryption from '@adonisjs/core/services/encryption'
-import ccxt from 'ccxt'
+import ccxt, { Exchange } from 'ccxt'
 
 interface Balance {
   asset: string
@@ -30,17 +30,18 @@ export default class ExchangesController {
     }))
 
     const balances: BalancesRecord = {}
+    // const balances: Balance = {}
 
     for (const apiKey of formattedApiKeys) {
       try {
         const exchangeClass = (ccxt as any)[apiKey.exchangeId]
-        const exchange = new exchangeClass({
+        const exchange: Exchange = new exchangeClass({
           apiKey: apiKey.apiKey,
           secret: apiKey.secret,
           enableRateLimit: true, // Active le limiteur de requêtes
         })
 
-        const balance = await exchange.fetchBalance()
+        const balance: any = await exchange.fetchBalance()
         // console.log(balance)
 
         const trimmedBalances = Object.keys(balance.total)
