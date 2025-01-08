@@ -1,9 +1,7 @@
-import ApiKey from '#models/api_key'
-
-type CreateApiKey = Pick<ApiKey, 'uid' | 'password' | 'exchangeId' | 'apiKey' | 'secret'>
+import ApiKey, { ApiKeyPick } from '#models/api_key'
 
 export class ApiKeyService {
-  static async createApiKey(data: CreateApiKey, userId: number) {
+  static async createApiKey(data: ApiKeyPick, userId: number) {
     return await ApiKey.create({
       ...data,
       userId,
