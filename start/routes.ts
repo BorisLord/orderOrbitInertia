@@ -55,4 +55,12 @@ router.post('/deleteApiKey', [ApiKeysController, 'delete']).use(middleware.auth(
 
 router.get('/accounts', [ExchangesController, 'getBalances']).use(middleware.auth())
 
-router.get('/orders', [OrdersController, 'getOrders']).use(middleware.auth())
+router.get('/openorders', [OrdersController, 'getOrders']).use(middleware.auth())
+
+router
+  .get('/createorders', async ({ inertia }) => {
+    return inertia.render('users/CreateOrders')
+  })
+  .use(middleware.auth())
+
+router.post('/cancelOrder', [OrdersController, 'cancelOrder']).use(middleware.auth())
