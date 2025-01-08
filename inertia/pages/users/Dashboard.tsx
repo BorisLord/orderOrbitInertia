@@ -89,11 +89,19 @@ const DashboardPage = () => {
           >
             Check Accounts
           </button>
+
           <button
             className="ml-4 mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            onClick={() => router.get('/orders')}
+            onClick={() => router.get('/openorders')}
           >
             Check Orders
+          </button>
+
+          <button
+            className="ml-4 mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            onClick={() => router.get('/createorders')}
+          >
+            Make Orders
           </button>
 
           <h2 className="text-xl font-bold mt-6">Your API Keys</h2>
