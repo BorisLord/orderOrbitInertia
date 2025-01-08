@@ -1,9 +1,7 @@
-import User from '#models/user'
-
-type CreateUser = Pick<User, 'email' | 'username' | 'password'>
+import User, { PickUser } from '#models/user'
 
 export class UserService {
-  static async createUser(data: CreateUser) {
+  static async createUser(data: PickUser) {
     try {
       await User.create({
         email: data.email,

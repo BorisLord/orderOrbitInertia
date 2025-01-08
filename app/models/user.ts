@@ -45,4 +45,6 @@ export default class User extends compose(BaseModel, AuthFinder) {
   }
 }
 
+export type PickUser = Pick<User, 'email' | 'username' | 'password'>
+
 export type { User }
