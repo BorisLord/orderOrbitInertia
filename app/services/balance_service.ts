@@ -1,11 +1,12 @@
 import Balance from '#models/balance'
 import User from '#models/user'
+import db from '@adonisjs/lucid/services/db'
 import { ApiKeyService } from './api_key_service.js'
 import { BrokerService } from './broker_service.js'
 import { CcxtService } from './ccxt_service.js'
 
 export class BalanceService {
-  static async importBalance(user: User) {
+  static async fetchBalanceFromBroker(user: User) {
     const userId = user.id
     const apiKeys = await ApiKeyService.getApiKeysByUser(userId, true)
 
@@ -83,5 +84,12 @@ export class BalanceService {
         }
       })
     )
+  }
+  static async getBalance(user: User) {
+    const balances = await db
+      .from('balances')
+      .select('exchange_id as exchangeId', 'asset', 'free', 'used', 'total', 'id')
+      .where('user_id', user.id)
+    return balances
   }
 }
