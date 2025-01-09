@@ -29,6 +29,27 @@ export class ApiKeyService {
     return apiKeys
   }
 
+  static async getApiKeysByUserAndExchange(
+    userId: number,
+    exchangeId: string,
+    includeSecret: boolean = false
+  ): Promise<ApiKeyPick[]> {
+    const query = ApiKey.query().where('user_id', userId).where('exchange_id', exchangeId)
+
+    if (includeSecret) {
+      query.select('id', 'exchangeId', 'apiKey', 'createdAt', 'secret')
+    } else {
+      query.select('id', 'exchangeId', 'apiKey', 'createdAt')
+    }
+
+    const apiKeys = await query
+
+    if (includeSecret) {
+      return this.decryptApiKey(apiKeys.map((apiKey) => apiKey.toJSON() as ApiKeyPick))
+    }
+    return apiKeys
+  }
+
   public static decryptApiKey(data: ApiKeyPick[]) {
     return data.map((d) => ({
       ...d,
