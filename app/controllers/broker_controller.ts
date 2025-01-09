@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
-
 import { ApiKeyService } from '#services/api_key_service'
 import { BrokerService } from '#services/broker_service'
+import { CcxtService } from '#services/ccxt_service'
 
 export default class BrokerController {
   public async getBalances({ auth, inertia }: HttpContext) {
@@ -35,7 +35,7 @@ export default class BrokerController {
 
           const balance = await exchange.fetchBalance()
 
-          const trimmedBalance = BrokerService.trimBalance(balance)
+          const trimmedBalance = CcxtService.trimBalance(balance)
 
           return { [apiKey.exchangeId]: trimmedBalance }
         } catch (error) {
