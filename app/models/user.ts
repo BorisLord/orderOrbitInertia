@@ -6,6 +6,7 @@ import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
 import ApiKey from './api_key.js'
 import Balance from './balance.js'
+import Order from './order.js'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -42,6 +43,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @hasMany(() => Balance)
   declare balances: HasMany<typeof Balance>
+
+  @hasMany(() => Order)
+  declare orders: HasMany<typeof Order>
 
   @beforeCreate()
   static async assignUuid(user: User) {
