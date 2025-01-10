@@ -8,19 +8,25 @@ export default class Order extends BaseModel {
   declare id: number
 
   @column()
+  declare orderId: string | undefined
+
+  @column()
   declare symbol: string
 
   @column()
   declare clientOrderId?: string
 
   @column()
-  declare status: string
+  declare exchangeId: string
 
   @column()
-  declare type?: string
+  declare status: string | undefined
 
   @column()
-  declare side: string
+  declare type?: string | undefined
+
+  @column()
+  declare side: string | undefined
 
   @column()
   declare price: number

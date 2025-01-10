@@ -3,25 +3,29 @@ import { Balances, Order } from 'ccxt'
 export class CcxtService {
   static trimBalance(balance: Balances) {
     return Object.keys(balance.total)
-      .filter((key) => key !== 'info' && key !== 'timestamp' && key !== 'datetime') // Ignorer les clés spéciales
+      .filter((key) => key !== 'info' && key !== 'timestamp' && key !== 'datetime')
       .map((asset) => ({
         asset,
         free: balance[asset].free || 0,
         used: balance[asset].used || 0,
         total: balance[asset].total || 0,
       }))
-      .filter(({ free, used, total }) => free !== 0 || used !== 0 || total !== 0) // Supprime les tokens inutiles
+      .filter(({ free, used, total }) => free !== 0 || used !== 0 || total !== 0)
   }
 
   static trimOrder(orders: Order[]) {
     return orders.map((order) => ({
-      id: order.id,
+      orderId: order?.id,
       symbol: order.symbol,
-      type: order.type,
-      side: order.side,
+      clientOrderId: order.clientOrderId,
+      status: order?.status,
+      type: order?.type,
+      side: order?.side,
       price: order.price,
       amount: order.amount,
-      dateTime: order.datetime,
+      filled: order.filled,
+      remaining: order.remaining,
+      cost: order.cost,
     }))
   }
 }
