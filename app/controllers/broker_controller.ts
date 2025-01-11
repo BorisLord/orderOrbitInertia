@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { BalanceService } from '#services/balance_service'
 import { BrokerService } from '#services/broker_service'
+import { ApiKeyService } from '#services/api_key_service'
 
 export default class BrokerController {
   public async getBalances({ auth, inertia }: HttpContext) {
@@ -64,7 +65,10 @@ export default class BrokerController {
   public async getBrokers({ auth, inertia }: HttpContext) {
     const user = auth.getUserOrFail()
     const exchangeIds = await BrokerService.getRegisterBroker(user)
+    const apiKeys = await ApiKeyService.getApiKeysByUser(user.id)
+    const exchanges = apiKeys.map((apiKey) => BrokerService.createExchange(apiKey))
+    const symbolsPerExchange = await BrokerService.getSymbolsPerExchange(exchanges, 'USDC')
 
-    return inertia.render('users/CreateOrders', { exchangeIds })
+    return inertia.render('users/CreateOrders', { exchangeIds, symbolsPerExchange })
   }
 }

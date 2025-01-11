@@ -40,15 +40,15 @@ export class BrokerService {
     }
   }
 
-  static createExchange(apiKeys: ApiKeyPick): Exchange {
-    const exchangeClass = (ccxt as any)[apiKeys.exchangeId]
+  static createExchange(apiKey: ApiKeyPick): Exchange {
+    const exchangeClass = (ccxt as any)[apiKey.exchangeId]
     if (!exchangeClass) {
-      throw new Error(`L'exchange ${apiKeys.exchangeId} n'est pas supporté`)
+      throw new Error(`L'exchange ${apiKey.exchangeId} n'est pas supporté`)
     }
 
     const exchange: Exchange = new exchangeClass({
-      apiKey: apiKeys.apiKey,
-      secret: apiKeys.secret,
+      apiKey: apiKey.apiKey,
+      secret: apiKey.secret,
       enableRateLimit: true,
     })
 
@@ -58,5 +58,26 @@ export class BrokerService {
   static async getRegisterBroker(user: User) {
     const res = await db.from('api_keys').where('user_id', user.id).select('exchange_id')
     return res.map((row) => row.exchange_id)
+  }
+
+  static async getPairsBySymbol(exchange: Exchange, symbol: string) {
+    await exchange.loadMarkets()
+    const symbols = Object.keys(exchange.markets)
+    return symbols.filter((s) => s.includes(symbol))
+  }
+
+  static async getSymbolsPerExchange(exchs: Exchange[], symbol: string) {
+    const symbolsPerExchange = await Promise.all(
+      exchs.map(async (exchange) => {
+        const pairs = await BrokerService.getPairsBySymbol(exchange, symbol)
+        return { [exchange.id]: pairs }
+      })
+    )
+
+    const result = symbolsPerExchange.reduce((acc, curr) => {
+      return { ...acc, ...curr }
+    }, {})
+
+    return result
   }
 }
