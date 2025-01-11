@@ -1,4 +1,6 @@
 import { ApiKeyPick } from '#models/api_key'
+import User from '#models/user'
+import db from '@adonisjs/lucid/services/db'
 import ccxt, { Exchange, exchanges, pro } from 'ccxt'
 
 export class BrokerService {
@@ -51,5 +53,10 @@ export class BrokerService {
     })
 
     return exchange
+  }
+
+  static async getRegisterBroker(user: User) {
+    const res = await db.from('api_keys').where('user_id', user.id).select('exchange_id')
+    return res.map((row) => row.exchange_id)
   }
 }
