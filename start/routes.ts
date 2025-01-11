@@ -12,8 +12,9 @@ import { middleware } from '#start/kernel'
 
 const UsersController = () => import('#controllers/users_controllers')
 const ApiKeysController = () => import('#controllers/api_keys_controller')
-const ExchangesController = () => import('#controllers/exchanges_controller')
+const ExchangesController = () => import('#controllers/broker_controller')
 const OrdersController = () => import('#controllers/orders_controller')
+const BrokerController = () => import('#controllers/broker_controller')
 
 // Page d'accueil
 router.get('/', async ({ inertia }) => {
@@ -39,7 +40,7 @@ router
 router.post('/logout', [UsersController, 'logout']).use(middleware.auth())
 
 // ! Protect This Route to admin only
-router.get('users/index', [UsersController, 'index'])
+// router.get('users/index', [UsersController, 'index'])
 
 // Création d'un utilisateur
 router.post('/create_users', [UsersController, 'store']).as('users.store')
@@ -57,10 +58,8 @@ router.get('/accounts', [ExchangesController, 'getBalances']).use(middleware.aut
 
 router.get('/openorders', [OrdersController, 'getOrders']).use(middleware.auth())
 
-router
-  .get('/createorders', async ({ inertia }) => {
-    return inertia.render('users/CreateOrders')
-  })
-  .use(middleware.auth())
+router.get('/createorders', [BrokerController, 'getBrokers']).use(middleware.auth())
+
+router.post('/createorders', [OrdersController, 'createOrder']).use(middleware.auth())
 
 router.post('/cancelOrder', [OrdersController, 'cancelOrder']).use(middleware.auth())
