@@ -3,9 +3,10 @@ import Layout from '../layout'
 
 interface Balance {
   asset: string
-  free: string
-  total: string
-  used: string
+  free: number
+  total: number
+  used: number
+  id: number
 }
 
 type BalancesRecord = Record<string, Balance[]>
@@ -36,7 +37,7 @@ const Account = () => {
                 </thead>
                 <tbody>
                   {brokerBalances.map((balance) => (
-                    <tr key={balance.asset}>
+                    <tr key={balance.id}>
                       <td className="border border-gray-300 px-4 py-2">{balance.asset}</td>
                       <td className="border border-gray-300 px-4 py-2 text-right">
                         {balance.free}
@@ -45,7 +46,7 @@ const Account = () => {
                         {balance.used}
                       </td>
                       <td className="border border-gray-300 px-4 py-2 text-right">
-                        {parseFloat(balance.free) + parseFloat(balance.used)}
+                        {balance.free + balance.used}
                       </td>
                     </tr>
                   ))}
