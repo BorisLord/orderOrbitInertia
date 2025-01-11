@@ -1,125 +1,136 @@
-import ApiKey from '#models/api_key'
+import { ApiKeyService } from '#services/api_key_service'
+import { BrokerService } from '#services/broker_service'
+import { CcxtService } from '#services/ccxt_service'
+import { OrderService } from '#services/order_service'
 import type { HttpContext } from '@adonisjs/core/http'
-import encryption from '@adonisjs/core/services/encryption'
-import ccxt, { Exchange, Order } from 'ccxt'
+import ccxt, { Exchange, Order, Currencies, Market } from 'ccxt'
 
 export default class OrdersControllersController {
-  public async getOrders({ auth, inertia, response }: HttpContext) {
-    const user = auth.user
+  public async getOrders({ auth, inertia }: HttpContext) {
+    const user = auth.getUserOrFail()
 
-    if (!user) {
-      return response.unauthorized({ message: 'User not authenticated' })
-    }
+    // const apiKeys = await ApiKeyService.getApiKeysByUser(user.id, true)
 
-    // const exchangeIds = await ApiKey.query().where('user_id', user?.id).select('exchangeId')
+    // const openOrders = await Promise.all(
+    //   apiKeys.map(async (apiKey) => {
+    //     try {
+    //       const exchange = BrokerService.createExchange(apiKey)
+    //       exchange.options['warnOnFetchOpenOrdersWithoutSymbol'] = false
 
-    const apiKeys = await ApiKey.query()
-      .where('user_id', user?.id)
-      .select('exchangeId', 'apiKey', 'secret')
+    //       if (exchange.has['fetchOpenOrders']) {
+    //         try {
+    //           // Tente de récupérer les ordres sans symbol
+    //           const orders = await exchange.fetchOpenOrders()
+    //           const trimmedOrders = CcxtService.trimOrder(orders)
+    //           return { [apiKey.exchangeId]: trimmedOrders }
+    //         } catch (e) {
+    //           if (e instanceof ccxt.ArgumentsRequired) {
+    //             console.log(
+    //               `${exchange.id}: fetchOpenOrders requires a symbol argument. Fetching symbols...`
+    //             )
+    //             // Charger les marchés pour récupérer les symboles
+    //             await exchange.loadMarkets()
+    //             const symbols = Object.keys(exchange.markets) // Récupère tous les symboles disponibles
+    //             // console.log(symbols)
+    //             const usdPairs = symbols.filter((symbol) => symbol.includes('USDC'))
+    //             // exchange.throttler.config['maxCapacity'] = 10000
 
-    const formattedApiKeys = apiKeys.map((apiKey) => ({
-      exchangeId: apiKey.exchangeId,
-      apiKey: apiKey.apiKey,
-      secret: encryption.decrypt(apiKey.secret),
-    }))
+    //             // Itérer sur chaque symbole pour récupérer les ordres ouverts
+    //             const ordersBySymbol = await Promise.all(
+    //               usdPairs.map(async (symbol) => {
+    //                 try {
+    //                   return await exchange.fetchOpenOrders(symbol)
+    //                 } catch (err) {
+    //                   console.error(
+    //                     `${exchange.id}: Error fetching orders for symbol ${symbol}:`,
+    //                     err.message
+    //                   )
+    //                   return [] // Ignorer les erreurs par symbole
+    //                 }
+    //               })
+    //             )
 
-    const openOrders: { [key: string]: any } = {}
+    //             // Combiner tous les ordres en une seule liste
+    //             const allOrders = ordersBySymbol.flat()
+    //             const trimmedOrders = CcxtService.trimOrder(allOrders)
+    //             return { [apiKey.exchangeId]: trimmedOrders }
+    //           } else {
+    //             console.log(`${exchange.id}: fetchOpenOrders failed with:`, e.message)
+    //             throw e // Relancer si ce n'est pas une erreur ArgumentsRequired
+    //           }
+    //         }
+    //       }
+    //     } catch (error) {
+    //       console.error(`Failed to fetch orders for ${apiKey.exchangeId}:`, error)
+    //       return { [apiKey.exchangeId]: { error: error.message } }
+    //     }
+    //   })
+    // )
 
-    for (const apiKey of formattedApiKeys) {
-      try {
-        const exchangeId = apiKey.exchangeId
-        const exchangeClass = (ccxt as any)[exchangeId]
-        const exchange: Exchange = new exchangeClass({
-          apiKey: apiKey.apiKey,
-          secret: apiKey.secret,
-          enableRateLimit: true,
-        })
+    const openOrders = await OrderService.getOrder(user)
+    // console.log('OpenOrder', openOrders)
 
-        exchange.options['warnOnFetchOpenOrdersWithoutSymbol'] = false
-        const orders: Order[] = await exchange.fetchOpenOrders()
-        // console.log(Object.keys(order))
-
-        const trimmedOrders = orders.map((order) => ({
-          id: order.id,
-          symbol: order.symbol,
-          type: order.type,
-          side: order.side,
-          price: order.price,
-          amount: order.amount,
-          dateTime: order.datetime,
-        }))
-        openOrders[apiKey.exchangeId] = trimmedOrders
-
-        // const jsonContent = JSON.stringify(order, null, 2)
-        // await fs.writeFile('./app/controllers/fetchOpenOrders.json', jsonContent, 'utf8')
-        // console.log(orders)
-      } catch (err) {
-        console.log(err)
-      }
-    }
-
-    // const exchangeId = exchangeIds[0].exchangeId
-    // const ex = new ccxt.binance()
-    // ex.options['warnOnFetchOpenOrdersWithoutSymbol'] = false
-    // const ticker = await ex.fetchOpenOrders()
-
-    // const jsonContent = JSON.stringify(ticker, null, 2)
-    // await fs.writeFile('./app/controllers/tickers.json', jsonContent, 'utf8')
-
-    // console.log(ex.fetchTickers(['ETH/BTC', 'BTC/USDT']))
-    // exchangeIds[0].fetchTickers(['ETH/BTC', 'BTC/USDT'])
-    // console.log(exchangeIds[0].exchangeId)
-    // exchangeIds.forEach((ex) => {
-    //   console.log(ex.exchangeId)
-    // })
-    console.log('Hey Bastard')
+    // console.log('Hey Bastard', openOrders)
     return inertia.render('users/OpenOrders', { openOrders })
   }
 
   public async cancelOrder({ auth, response, request, inertia }: HttpContext) {
-    const user = auth.user
+    const user = auth.getUserOrFail()
 
-    if (!user) {
-      return response.unauthorized({ message: 'User not auth,enticated' })
-    }
+    const { id, exchangeId, symbol } = request.only(['id', 'exchangeId', 'symbol'])
 
-    const id = request.input('id')
-    const exchangeId = request.input('exchangeId')
-    const symbol = request.input('symbol')
+    const apiKeys = await ApiKeyService.getApiKeysByUserAndExchange(user.id, exchangeId, true)
 
-    const apiKeys = await ApiKey.query()
-      .where('user_id', user?.id)
-      .where('exchangeId', exchangeId)
-      .select('apiKey', 'secret')
+    const exchange = BrokerService.createExchange(apiKeys[0])
 
-    console.log(apiKeys)
-
-    const formattedApiKey = apiKeys.map((apiKey) => ({
-      exchangeId,
-      apiKey: apiKey.apiKey,
-      secret: encryption.decrypt(apiKey.secret),
-    }))
-
-    const exchangeClass = (ccxt as any)[exchangeId]
-    const exchange: Exchange = new exchangeClass({
-      apiKey: formattedApiKey[0].apiKey,
-      secret: formattedApiKey[0].secret,
-      enableRateLimit: true, // Active le limiteur de requêtes
-    })
-
-    // console.log(exchange)
-    console.log('symbol: ', symbol)
     const cancelOrder = await exchange.cancelOrder(id, symbol)
-    console.log(cancelOrder)
+    console.log('cancelOrder (delete me)', cancelOrder)
 
     return inertia.render('users/Orders')
   }
 
   public async createOrder({ auth, response, request, inertia }: HttpContext) {
-    const user = auth.user
+    const user = auth.getUserOrFail()
+    const exchangeIds = ['binance', 'phemex']
+    const symbol = 'BTC/USDC'
+    const type = 'limit'
+    const side = 'buy'
+    const amount = 1
 
-    if (!user) {
-      return response.unauthorized({ message: 'User not auth,enticated' })
-    }
+    // const exchangeIds = request.input('exchangeId')
+    // Recuperer un [] avec quel exchange ?
+    //          symbol "BTC/USDC"
+    //          type   "limit | market"
+    //          side   "buy | sell"
+    //          amount  number
+
+    // createOrderParam
+    // symbol: string,
+    // type: OrderType,
+    // side: OrderSide,
+    // amount: number,
+    // price?: Num,
+    // params?: {}
+
+    const apiKeys = await ApiKeyService.getApiKeysByUser(user.id, true)
+
+    const commonApiKeys = apiKeys.filter((apiKey) => exchangeIds.includes(apiKey.exchangeId))
+
+    const orders = await Promise.all(
+      commonApiKeys.map(async (apiKey) => {
+        try {
+          const exchange = BrokerService.createExchange(apiKey)
+
+          const order = await exchange.createOrder(symbol, type, side, amount)
+
+          return { [apiKey.exchangeId]: trimmedBalance }
+        } catch (error) {
+          console.error(`Failed to fetch balance for ${apiKey.exchangeId}:`, error)
+          return { [apiKey.exchangeId]: { error: error.message } }
+        }
+      })
+    )
+
+    return inertia.render('users/CreateOrders')
   }
 }
