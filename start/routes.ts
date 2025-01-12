@@ -15,6 +15,7 @@ const ApiKeysController = () => import('#controllers/api_keys_controller')
 const ExchangesController = () => import('#controllers/broker_controller')
 const OrdersController = () => import('#controllers/orders_controller')
 const BrokerController = () => import('#controllers/broker_controller')
+const RedisTestController = () => import('#controllers/redis_tests_controller')
 
 // Page d'accueil
 router.get('/', async ({ inertia }) => {
@@ -60,6 +61,8 @@ router.get('/openorders', [OrdersController, 'getOrders']).use(middleware.auth()
 
 router.get('/createorders', [BrokerController, 'getBrokers']).use(middleware.auth())
 
-router.post('/createorders', [OrdersController, 'createOrder']).use(middleware.auth())
+router.post('/createOrder', [OrdersController, 'createOrder']).use(middleware.auth())
 
 router.post('/cancelOrder', [OrdersController, 'cancelOrder']).use(middleware.auth())
+
+router.get('/test-redis', [RedisTestController, 'testConnection'])
