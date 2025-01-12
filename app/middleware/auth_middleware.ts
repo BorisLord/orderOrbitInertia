@@ -1,8 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 import type { Authenticators } from '@adonisjs/auth/types'
-import { BalanceService } from '#services/balance_service'
-import { OrderService } from '#services/order_service'
+import redis from '@adonisjs/redis/services/main'
 
 /**
  * Auth middleware is used authenticate HTTP requests and deny
@@ -25,9 +24,9 @@ export default class AuthMiddleware {
 
     const user = ctx.auth.user
     if (user) {
-      console.log('Balance Import User:', user.id)
-      BalanceService.fetchBalanceFromBroker(user)
-      OrderService.fetchOrderFromBroker(user)
+      console.log('Redis register user:', user.id)
+      const key = `user:${user.id}`
+      await redis.set(key, Date.now().toString(), 'EX', 600)
     }
     return next()
   }

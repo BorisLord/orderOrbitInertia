@@ -13,4 +13,9 @@ export class UserService {
       throw new Error('Impossible de créer l’utilisateur.')
     }
   }
+
+  static async findUserById(userId: number) {
+    const user = await User.find(userId)
+    return user
+  }
 }
