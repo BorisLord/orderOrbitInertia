@@ -1,9 +1,10 @@
 import { ApiKeyService } from '#services/api_key_service'
 import { BrokerService } from '#services/broker_service'
-import { CcxtService } from '#services/ccxt_service'
+// import { CcxtService } from '#services/ccxt_service'
 import { OrderService } from '#services/order_service'
 import type { HttpContext } from '@adonisjs/core/http'
-import ccxt, { Exchange, Order, Currencies, Market } from 'ccxt'
+// import ccxt, { Exchange, Order, Currencies, Market } from 'ccxt'
+// import { syncBuiltinESMExports } from 'module'
 
 export default class OrdersControllersController {
   public async getOrders({ auth, inertia }: HttpContext) {
@@ -74,7 +75,7 @@ export default class OrdersControllersController {
     return inertia.render('users/OpenOrders', { openOrders })
   }
 
-  public async cancelOrder({ auth, response, request, inertia }: HttpContext) {
+  public async cancelOrder({ auth, request, inertia }: HttpContext) {
     const user = auth.getUserOrFail()
 
     const { id, exchangeId, symbol } = request.only(['id', 'exchangeId', 'symbol'])
@@ -89,48 +90,43 @@ export default class OrdersControllersController {
     return inertia.render('users/Orders')
   }
 
-  public async createOrder({ auth, response, request, inertia }: HttpContext) {
+  public async createOrder({ auth, request }: HttpContext) {
     const user = auth.getUserOrFail()
-    const exchangeIds = ['binance', 'phemex']
-    const symbol = 'BTC/USDC'
-    const type = 'limit'
-    const side = 'buy'
-    const amount = 1
+    const { exchange, symbol, type, side, amount, price } = request.only([
+      'exchange',
+      'symbol',
+      'type',
+      'side',
+      'amount',
+      'price',
+    ])
 
-    // const exchangeIds = request.input('exchangeId')
-    // Recuperer un [] avec quel exchange ?
-    //          symbol "BTC/USDC"
-    //          type   "limit | market"
-    //          side   "buy | sell"
-    //          amount  number
+    const smallEx = exchange.toLowerCase()
 
-    // createOrderParam
-    // symbol: string,
-    // type: OrderType,
-    // side: OrderSide,
-    // amount: number,
-    // price?: Num,
-    // params?: {}
+    console.log(request.body())
 
-    const apiKeys = await ApiKeyService.getApiKeysByUser(user.id, true)
+    const apiKey = await ApiKeyService.getApiKeysByUserAndExchange(user.id, smallEx, true)
 
-    const commonApiKeys = apiKeys.filter((apiKey) => exchangeIds.includes(apiKey.exchangeId))
-
-    const orders = await Promise.all(
-      commonApiKeys.map(async (apiKey) => {
+    const res = await Promise.all(
+      apiKey.map(async (Key) => {
         try {
-          const exchange = BrokerService.createExchange(apiKey)
+          const ex = BrokerService.createExchange(Key)
+          let order
+          if (type === 'limit') {
+            order = await ex.createOrder(symbol, type, side, amount, price)
+          }
+          order = await ex.createOrder(symbol, type, side, amount)
 
-          const order = await exchange.createOrder(symbol, type, side, amount)
-
-          return { [apiKey.exchangeId]: trimmedBalance }
+          return { [Key.exchangeId]: order }
         } catch (error) {
-          console.error(`Failed to fetch balance for ${apiKey.exchangeId}:`, error)
-          return { [apiKey.exchangeId]: { error: error.message } }
+          console.error(`Failed to fetch balance for ${Key.exchangeId}:`, error)
+          return { [Key.exchangeId]: { error: error.message } }
         }
       })
     )
 
-    return inertia.render('users/CreateOrders')
+    console.log(res)
+
+    // return inertia.render('users/OpenOrders')
   }
 }

@@ -66,18 +66,49 @@ export class BrokerService {
     return symbols.filter((s) => s.includes(symbol))
   }
 
-  static async getSymbolsPerExchange(exchs: Exchange[], symbol: string) {
-    const symbolsPerExchange = await Promise.all(
-      exchs.map(async (exchange) => {
-        const pairs = await BrokerService.getPairsBySymbol(exchange, symbol)
-        return { [exchange.id]: pairs }
+  static async getSymbolsPerExchange(apiKeys: ApiKeyPick[], quoteCurrency: string) {
+    try {
+      const promises = apiKeys.map(async (apiKeyInfo) => {
+        const exchange = this.createExchange(apiKeyInfo)
+
+        // Charger les marchés et filtrer ceux qui sont Spot avec la quoteCurrency
+        await exchange.loadMarkets()
+        const spotMarkets = Object.values(exchange.markets).filter(
+          (market) => market.type === 'spot' && market.quote === quoteCurrency
+        )
+
+        // Récupérer les tickers uniquement pour les symboles Spot
+        const symbols = spotMarkets.map((market) => market.symbol)
+        const tickers = await exchange.fetchTickers(symbols)
+
+        // Formater les tickers pour cet échange
+        const formattedTickers = Object.values(tickers).reduce(
+          (acc: { [key: string]: any }, ticker) => {
+            acc[ticker.symbol] = {
+              base: ticker.symbol.split('/')[0],
+              quote: ticker.symbol.split('/')[1],
+              lastPrice: ticker.last,
+              volume: ticker.baseVolume,
+              high: ticker.high,
+              low: ticker.low,
+            }
+            return acc
+          },
+          {}
+        )
+
+        // Retourner l'objet structuré pour cet échange
+        return { [exchange.describe().name]: formattedTickers }
       })
-    )
 
-    const result = symbolsPerExchange.reduce((acc, curr) => {
-      return { ...acc, ...curr }
-    }, {})
+      // Résoudre toutes les promesses
+      const results = await Promise.all(promises)
 
-    return result
+      // Fusionner les résultats par échange dans un seul objet
+      return results.reduce((acc, curr) => ({ ...acc, ...curr }), {})
+    } catch (error) {
+      console.error('Error fetching spot symbols per exchange:', error)
+      throw error
+    }
   }
 }

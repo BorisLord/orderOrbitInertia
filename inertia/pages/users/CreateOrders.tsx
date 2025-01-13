@@ -1,52 +1,78 @@
-import { Head, usePage } from '@inertiajs/react'
+import { Head, router, usePage } from '@inertiajs/react'
 import Layout from '../layout'
 import { useState, useEffect } from 'react'
 
+import { PageProps as InertiaPageProps } from '@inertiajs/core'
+
+interface PageProps extends InertiaPageProps {
+  symbolsPerExchange: Record<string, Record<string, any>> // Structure des symboles
+}
+
 const CreateOrders = () => {
-  const { exchangeIds } = usePage().props
+  const { symbolsPerExchange } = usePage<PageProps>().props
 
   const [selectedExchange, setSelectedExchange] = useState('')
-  const [symbols, setSymbols] = useState([])
+  const [symbols, setSymbols] = useState<string[]>([])
   const [selectedSymbol, setSelectedSymbol] = useState('')
-  const [type, setType] = useState('limit')
-  const [side, setSide] = useState('buy')
+  const [type, setType] = useState<'market' | 'limit'>('limit')
+  const [side, setSide] = useState<'sell' | 'buy'>('buy')
   const [amount, setAmount] = useState('')
+  const [lastPrice, setLastPrice] = useState<number | null>(null) // Prix en USD pour la paire sélectionnée
+  const [quantity, setQuantity] = useState<number | null>(null) // Quantité reçue calculée
+  const [price, setPrice] = useState<number | ''>('') // Prix spécifié par l'utilisateur pour les ordres limit
 
-  // Simule une récupération de symboles pour un exchange donné
   useEffect(() => {
     if (selectedExchange) {
-      // Simuler une API qui récupère les symboles pour l'exchange sélectionné
-      const fetchSymbols = async (exchange: any) => {
-        const availableSymbols: Record<string, string[]> = {
-          binance: ['BTC/USDT', 'BTC/USDC', 'ETH/USDT', 'ETH/USDC'],
-          phemex: ['BTC/USD', 'ETH/USD', 'XRP/USD'],
-        }
-        return availableSymbols[exchange] || []
-      }
-
-      fetchSymbols(selectedExchange).then((symbols) => setSymbols(symbols as any))
+      // Extraire les symboles disponibles pour l'échange sélectionné
+      const exchangeSymbols = symbolsPerExchange[selectedExchange]
+        ? Object.keys(symbolsPerExchange[selectedExchange])
+        : []
+      setSymbols(exchangeSymbols)
     } else {
       setSymbols([])
     }
-  }, [selectedExchange])
+  }, [selectedExchange, symbolsPerExchange])
 
-  // Gestion de la soumission du formulaire
-  const handleSubmit = (e: any) => {
+  useEffect(() => {
+    if (selectedExchange && selectedSymbol) {
+      // Récupérer le prix de la paire sélectionnée
+      const price = symbolsPerExchange[selectedExchange]?.[selectedSymbol]?.lastPrice || null
+      setLastPrice(price)
+      // Si le prix est défini, le définir automatiquement pour les ordres limit
+      if (price && type === 'limit') {
+        setPrice(price)
+      }
+    } else {
+      setLastPrice(null)
+      setPrice('') // Réinitialiser le prix si la paire change
+    }
+  }, [selectedExchange, selectedSymbol, symbolsPerExchange, type])
+
+  useEffect(() => {
+    if (lastPrice && amount) {
+      // Calculer la quantité reçue en fonction du montant et du prix
+      const baseAmount = parseFloat(amount)
+      const calculatedQuantity = side === 'buy' ? baseAmount / lastPrice : baseAmount * lastPrice
+      setQuantity(calculatedQuantity)
+    } else {
+      setQuantity(null)
+    }
+  }, [amount, lastPrice, side])
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    // Construire l'objet de commande
     const orderData = {
       exchange: selectedExchange,
       symbol: selectedSymbol,
       type,
       side,
       amount: parseFloat(amount),
+      price: type === 'limit' ? Number(price) : undefined, // Inclure le prix uniquement pour les ordres limit
     }
 
-    // console.log('Order Data:', orderData)
-
-    // Simuler une soumission via une API
-    alert(`Order created: ${JSON.stringify(orderData)}`)
+    console.log('DATA', orderData)
+    router.post('/createOrder', orderData)
   }
 
   return (
@@ -56,7 +82,7 @@ const CreateOrders = () => {
         <div className="max-w-xl mx-auto p-4 bg-white shadow rounded">
           <h1 className="text-xl font-bold mb-4">Create an Order</h1>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Sélection de l'exchange */}
+            {/* Exchange selection */}
             <div>
               <label htmlFor="exchange" className="block font-medium">
                 Select Exchange
@@ -69,7 +95,7 @@ const CreateOrders = () => {
                 required
               >
                 <option value="">Select an Exchange</option>
-                {exchangeIds?.map((exchange: any) => (
+                {Object.keys(symbolsPerExchange).map((exchange) => (
                   <option key={exchange} value={exchange}>
                     {exchange}
                   </option>
@@ -77,7 +103,7 @@ const CreateOrders = () => {
               </select>
             </div>
 
-            {/* Sélection de la paire */}
+            {/* Symbol selection */}
             <div>
               <label htmlFor="symbol" className="block font-medium">
                 Select Symbol
@@ -99,23 +125,51 @@ const CreateOrders = () => {
               </select>
             </div>
 
-            {/* Sélection du type */}
+            {/* Afficher le prix en USD */}
+            {lastPrice !== null && (
+              <div className="text-gray-700">
+                <strong>Last Price:</strong> {lastPrice.toFixed(2)} USD
+              </div>
+            )}
+
+            {/* Type */}
             <div>
               <label htmlFor="type" className="block font-medium">
-                Order Type
+                Type
               </label>
               <select
                 id="type"
                 value={type}
-                onChange={(e) => setType(e.target.value)}
+                onChange={(e) => setType(e.target.value as 'market' | 'limit')}
                 className="mt-1 block w-full border border-gray-300 rounded p-2"
               >
-                <option value="limit">Limit</option>
                 <option value="market">Market</option>
+                <option value="limit">Limit</option>
               </select>
             </div>
 
-            {/* Sélection du côté */}
+            {/* Price (only for limit orders) */}
+            {type === 'limit' && (
+              <div>
+                <label htmlFor="price" className="block font-medium">
+                  Price (USD per {selectedSymbol.split('/')[0] || 'symbol'})
+                </label>
+                <input
+                  type="number"
+                  id="price"
+                  value={price || ''}
+                  onChange={(e) => setPrice(parseFloat(e.target.value))}
+                  className="mt-1 block w-full border border-gray-300 rounded p-2"
+                  min="0.0001"
+                  step="0.0001"
+                  placeholder="Enter the price"
+                  required
+                  disabled={!selectedSymbol}
+                />
+              </div>
+            )}
+
+            {/* Order Side */}
             <div>
               <label htmlFor="side" className="block font-medium">
                 Order Side
@@ -123,7 +177,7 @@ const CreateOrders = () => {
               <select
                 id="side"
                 value={side}
-                onChange={(e) => setSide(e.target.value)}
+                onChange={(e) => setSide(e.target.value as 'sell' | 'buy')}
                 className="mt-1 block w-full border border-gray-300 rounded p-2"
               >
                 <option value="buy">Buy</option>
@@ -131,10 +185,10 @@ const CreateOrders = () => {
               </select>
             </div>
 
-            {/* Quantité */}
+            {/* Amount */}
             <div>
               <label htmlFor="amount" className="block font-medium">
-                Amount
+                Amount ({selectedSymbol || 'Select a symbol'})
               </label>
               <input
                 type="number"
@@ -144,12 +198,30 @@ const CreateOrders = () => {
                 className="mt-1 block w-full border border-gray-300 rounded p-2"
                 min="0.0001"
                 step="0.0001"
-                placeholder="Enter amount"
+                placeholder="Enter amount in USD"
                 required
+                disabled={!selectedSymbol}
               />
             </div>
 
-            {/* Bouton de soumission */}
+            {/* Afficher la quantité reçue */}
+            {quantity !== null && (
+              <div className="text-gray-700">
+                {side === 'buy' ? (
+                  <>
+                    You will receive approximately <strong>{quantity.toFixed(6)}</strong>{' '}
+                    {selectedSymbol.split('/')[0]}.
+                  </>
+                ) : (
+                  <>
+                    You will sell {amount} {selectedSymbol.split('/')[0]} for approximately{' '}
+                    <strong>{quantity.toFixed(2)}</strong> USD.
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Submit */}
             <div>
               <button
                 type="submit"

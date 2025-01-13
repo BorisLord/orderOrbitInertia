@@ -56,19 +56,11 @@ export default class BrokerController {
     )
 
     return inertia.render('users/Account', { balances: formattedBalances })
-
-    // return response.json({
-    // message: 'get Balance OK',
-    // balances,
-    // })
   }
   public async getBrokers({ auth, inertia }: HttpContext) {
     const user = auth.getUserOrFail()
-    const exchangeIds = await BrokerService.getRegisterBroker(user)
     const apiKeys = await ApiKeyService.getApiKeysByUser(user.id)
-    const exchanges = apiKeys.map((apiKey) => BrokerService.createExchange(apiKey))
-    const symbolsPerExchange = await BrokerService.getSymbolsPerExchange(exchanges, 'USDC')
-
-    return inertia.render('users/CreateOrders', { exchangeIds, symbolsPerExchange })
+    const symbolsPerExchange = await BrokerService.getSymbolsPerExchange(apiKeys, 'USDC')
+    return inertia.render('users/CreateOrders', { symbolsPerExchange })
   }
 }
