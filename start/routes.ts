@@ -66,3 +66,7 @@ router.post('/createOrder', [OrdersController, 'createOrder']).use(middleware.au
 router.post('/cancelOrder', [OrdersController, 'cancelOrder']).use(middleware.auth())
 
 router.get('/test-redis', [RedisTestController, 'testConnection'])
+
+router.get('/healthCheck', async () => {
+  return { status: 'ok' }
+})
