@@ -9,7 +9,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "start": "node bin/server.js",
-    "build": "node ace build",
+    "build": "NODE_ENV=production node ace build",
     "preview": "node buildPreview",
     "dev": "node ace serve --hmr",
     "test": "node ace test",
