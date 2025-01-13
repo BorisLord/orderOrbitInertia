@@ -1,6 +1,9 @@
 # Utilise l'image alpine de Node.js LTS
 FROM node:lts-alpine
 
+# Installer curl
+RUN apk add --no-cache curl
+
 # Définir le répertoire de travail
 WORKDIR /app
 
