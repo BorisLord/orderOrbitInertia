@@ -25,5 +25,8 @@ RUN npm ci --omit=dev
 # Exposer le port utilisé par l'application
 EXPOSE 3333
 
+# Définir NODE_ENV pour l'exécution
+ENV NODE_ENV=production
+
 # Commande pour démarrer l'application
-CMD ["NODE_ENV=production" "node", "bin/server.js"]
+CMD ["node", "bin/server.js"]
