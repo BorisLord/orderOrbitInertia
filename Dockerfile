@@ -26,4 +26,4 @@ RUN npm ci --omit=dev
 EXPOSE 3333
 
 # Commande pour démarrer l'application
-CMD ["node", "bin/server.js"]
+CMD ["NODE_ENV=production" "node", "bin/server.js"]
