@@ -87,7 +87,7 @@ export default class OrdersControllersController {
     const cancelOrder = await exchange.cancelOrder(id, symbol)
     console.log('cancelOrder (delete me)', cancelOrder)
 
-    return inertia.render('users/Orders')
+    return inertia.render('users/Orders' )
   }
 
   public async createOrder({ auth, request }: HttpContext) {
