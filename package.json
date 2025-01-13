@@ -1,6 +1,9 @@
 {
   "name": "order-orbit-inertia",
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "engines": {
+    "node": "22.13"
+  },
   "private": true,
   "type": "module",
   "license": "UNLICENSED",
