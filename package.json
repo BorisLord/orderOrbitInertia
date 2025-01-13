@@ -10,6 +10,7 @@
   "scripts": {
     "start": "node bin/server.js",
     "build": "node ace build",
+    "preview": "node buildPreview",
     "dev": "node ace serve --hmr",
     "test": "node ace test",
     "lint": "eslint .",

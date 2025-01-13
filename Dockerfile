@@ -22,5 +22,8 @@ WORKDIR /app/build
 # Installer uniquement les dépendances de production dans le répertoire build
 RUN npm ci --omit=dev
 
+# Exposer le port utilisé par l'application
+EXPOSE 3333
+
 # Commande pour démarrer l'application
 CMD ["node", "bin/server.js"]
