@@ -18,6 +18,10 @@ ARG DB_USER
 ARG DB_DATABASE
 ARG REDIS_HOST
 ARG REDIS_PORT
+ARG PORT
+ARG APP_KEY
+ARG HOST
+ARG LOG_LEVEL
 
 # Passer les variables d'environnement au runtime
 ENV SESSION_DRIVER=$SESSION_DRIVER \
@@ -26,7 +30,11 @@ ENV SESSION_DRIVER=$SESSION_DRIVER \
     DB_USER=$DB_USER \
     DB_DATABASE=$DB_DATABASE \
     REDIS_HOST=$REDIS_HOST \
-    REDIS_PORT=$REDIS_PORT
+    REDIS_PORT=$REDIS_PORT \
+    PORT=$PORT \
+    APP_KEY=$APP_KEY \
+    HOST=$HOST \
+    LOG_LEVEL=$LOG_LEVEL
 
 # Installer les dépendances nécessaires pour le build
 RUN npm install
