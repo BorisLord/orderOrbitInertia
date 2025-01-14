@@ -196,8 +196,8 @@ const CreateOrders = () => {
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded p-2"
-                min="0.0001"
-                step="0.0001"
+                min="0.000001"
+                step="0.000001"
                 placeholder="Enter amount in USD"
                 required
                 disabled={!selectedSymbol}
