@@ -188,7 +188,7 @@ const CreateOrders = () => {
             {/* Amount */}
             <div>
               <label htmlFor="amount" className="block font-medium">
-                Amount ({selectedSymbol || 'Select a symbol'})
+                Amountt ({selectedSymbol || 'Select a symbol'})
               </label>
               <input
                 type="number"
