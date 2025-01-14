@@ -23,6 +23,12 @@ export default class WorkerServiceProvider {
    * The process has been started
    */
   async ready() {
+    console.log('MIGRation VAR', process.env.RUNNING_MIGRATIONS)
+    if (process.env.RUNNING_MIGRATIONS === 'true') {
+      console.log('Migrations in progress. Workers will not be started.')
+      return
+    }
+
     console.log('Starting WorkerService...')
     await WorkerService.start()
   }
@@ -31,6 +37,6 @@ export default class WorkerServiceProvider {
    * Preparing to shutdown the app
    */
   async shutdown() {
-    // WorkerService.shutdown()
+    WorkerService.shutdown()
   }
 }
