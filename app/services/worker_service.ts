@@ -3,8 +3,6 @@ import { BalanceService } from './balance_service.js'
 import { OrderService } from './order_service.js'
 import { UserService } from './user_service.js'
 import User from '#models/user'
-// BalanceService.fetchBalanceFromBroker(user)
-// OrderService.fetchOrderFromBroker(user)
 
 export class WorkerService {
   static activeWorkers: Map<string, NodeJS.Timeout> = new Map()
@@ -19,7 +17,7 @@ export class WorkerService {
           this.startWorker(userId)
         }
       }
-    }, 20000)
+    }, 30000)
   }
 
   static startWorker(userId: string) {
@@ -33,7 +31,7 @@ export class WorkerService {
         BalanceService.fetchBalanceFromBroker(user as unknown as User)
         OrderService.fetchOrderFromBroker(user as unknown as User)
       }
-    }, 20000)
+    }, 30000)
 
     this.activeWorkers.set(userId, intervalId)
 
@@ -50,7 +48,7 @@ export class WorkerService {
         clearInterval(checkInterval)
         console.log(`Stopped workerrrrrr for user: ${userId}`)
       }
-    }, 20000)
+    }, 30000)
   }
 
   static shutdown() {
