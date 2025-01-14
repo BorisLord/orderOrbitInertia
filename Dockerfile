@@ -31,9 +31,10 @@ EXPOSE 3333
 # Définir NODE_ENV pour l'exécution
 ENV NODE_ENV=production
 
+# Executer les migration
+RUN node ace migration:run --force
+
 # Démarrer l'application
 CMD ["node", "bin/server.js"]
 
-# Executer les migration
-RUN node ace migration:run --force
 
