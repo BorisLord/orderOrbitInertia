@@ -23,7 +23,6 @@ export default class WorkerServiceProvider {
    * The process has been started
    */
   async ready() {
-    console.log('MIGRation VAR', process.env.RUNNING_MIGRATIONS)
     if (process.env.RUNNING_MIGRATIONS === 'true') {
       console.log('Migrations in progress. Workers will not be started.')
       return

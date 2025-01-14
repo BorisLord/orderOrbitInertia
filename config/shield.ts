@@ -35,7 +35,7 @@ const shieldConfig = defineConfig({
    * Force browser to always use HTTPS
    */
   hsts: {
-    enabled: true,
+    enabled: false,
     maxAge: '180 days',
   },
 
