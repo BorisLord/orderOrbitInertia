@@ -31,6 +31,6 @@ export default class WorkerServiceProvider {
    * Preparing to shutdown the app
    */
   async shutdown() {
-    WorkerService.shutdown()
+    // WorkerService.shutdown()
   }
 }
