@@ -91,10 +91,10 @@ export default class OrdersControllersController {
     const order = await Order.query().where('id', id).andWhere('user_id', user.id)
     const exchangeOrderId: string = order[0].orderId?.toString() || ''
 
-    const cancelOrder = await exchange.cancelOrder(exchangeOrderId, symbol)
+    await exchange.cancelOrder(exchangeOrderId, symbol)
     // console.log('cancelOrder (delete me)', cancelOrder)
 
-    // return inertia.render('users/Orders')
+    return inertia.render('users/Orders')
   }
 
   public async createOrder({ auth, request, inertia }: HttpContext) {
