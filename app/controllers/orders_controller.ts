@@ -1,3 +1,4 @@
+import Order from '#models/order'
 import { ApiKeyService } from '#services/api_key_service'
 import { BrokerService } from '#services/broker_service'
 // import { CcxtService } from '#services/ccxt_service'
@@ -80,17 +81,23 @@ export default class OrdersControllersController {
 
     const { id, exchangeId, symbol } = request.only(['id', 'exchangeId', 'symbol'])
 
+    // console.log('CANCEL', id, exchangeId, symbol)
+
     const apiKeys = await ApiKeyService.getApiKeysByUserAndExchange(user.id, exchangeId, true)
+    console.log('API', apiKeys)
 
     const exchange = BrokerService.createExchange(apiKeys[0])
 
-    const cancelOrder = await exchange.cancelOrder(id, symbol)
-    console.log('cancelOrder (delete me)', cancelOrder)
+    const order = await Order.query().where('id', id).andWhere('user_id', user.id)
+    const exchangeOrderId: string = order[0].orderId?.toString() || ''
 
-    return inertia.render('users/Orders')
+    const cancelOrder = await exchange.cancelOrder(exchangeOrderId, symbol)
+    // console.log('cancelOrder (delete me)', cancelOrder)
+
+    // return inertia.render('users/Orders')
   }
 
-  public async createOrder({ auth, request }: HttpContext) {
+  public async createOrder({ auth, request, inertia }: HttpContext) {
     const user = auth.getUserOrFail()
     const { exchange, symbol, type, side, amount, price } = request.only([
       'exchange',
@@ -103,7 +110,7 @@ export default class OrdersControllersController {
 
     const smallEx = exchange.toLowerCase()
 
-    console.log(request.body())
+    console.log('BODY', request.body())
 
     const apiKey = await ApiKeyService.getApiKeysByUserAndExchange(user.id, smallEx, true)
 
@@ -114,9 +121,9 @@ export default class OrdersControllersController {
           let order
           if (type === 'limit') {
             order = await ex.createOrder(symbol, type, side, amount, price)
+          } else {
+            order = await ex.createOrder(symbol, type, side, amount)
           }
-          order = await ex.createOrder(symbol, type, side, amount)
-
           return { [Key.exchangeId]: order }
         } catch (error) {
           console.error(`Failed to fetch balance for ${Key.exchangeId}:`, error)
@@ -125,8 +132,8 @@ export default class OrdersControllersController {
       })
     )
 
-    console.log(res)
+    console.log('res', res)
 
-    // return inertia.render('users/OpenOrders')
+    return inertia.render('users/OpenOrders')
   }
 }
