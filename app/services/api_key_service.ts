@@ -1,4 +1,6 @@
 import ApiKey, { ApiKeyPick } from '#models/api_key'
+import Balance from '#models/balance'
+import Order from '#models/order'
 import encryption from '@adonisjs/core/services/encryption'
 
 export class ApiKeyService {
@@ -62,6 +64,24 @@ export class ApiKeyService {
       .where('id', apiKeyId)
       .andWhere('user_id', userId)
       .firstOrFail()
+
+    const balances = await Balance.findManyBy({
+      exchange_id: apiKey.exchangeId,
+      user_id: userId,
+    })
+
+    const orders = await Order.findManyBy({
+      exchange_id: apiKey.exchangeId,
+      user_id: userId,
+    })
+
+    for (const order of orders) {
+      await order.delete()
+    }
+
+    for (const balance of balances) {
+      await balance.delete()
+    }
 
     await apiKey.delete()
   }
