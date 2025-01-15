@@ -11,7 +11,6 @@ export class OrderService {
     const userId = user.id
     const apiKeys = await ApiKeyService.getApiKeysByUser(userId, true)
 
-    // const openOrders =
     await Promise.all(
       apiKeys.map(async (apiKey) => {
         try {
@@ -86,8 +85,13 @@ export class OrderService {
       for (const trimmedOrder of trimmedOrders) {
         if (existingOrdersMap.has(trimmedOrder.clientOrderId)) {
           const existingOrder = existingOrdersMap.get(trimmedOrder.clientOrderId)
+          if (!trimmedOrder.id) {
+            console.error('Order IIIIIIIIIIDDDDID is missing, skipping order:', trimmedOrder)
+            continue
+          }
           if (existingOrder) {
             await Order.query().where('id', existingOrder.id).update({
+              orderId: trimmedOrder.orderId,
               status: trimmedOrder.status,
               type: trimmedOrder.type,
               side: trimmedOrder.side,
@@ -103,7 +107,7 @@ export class OrderService {
           await Order.create({
             userId,
             exchangeId,
-            clientOrderId: trimmedOrder.clientOrderId,
+            orderId: trimmedOrder.orderId,
             symbol: trimmedOrder.symbol,
             status: trimmedOrder.status,
             type: trimmedOrder.type,

@@ -15,7 +15,7 @@ export class CcxtService {
 
   static trimOrder(orders: Order[]) {
     return orders.map((order) => ({
-      orderId: order?.id,
+      orderId: order.id,
       symbol: order.symbol,
       clientOrderId: order.clientOrderId,
       status: order?.status,

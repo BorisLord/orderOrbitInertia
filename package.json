@@ -13,7 +13,7 @@
     "preview": "node buildPreview",
     "dev": "node ace serve --hmr",
     "test": "node ace test",
-    "lint": "eslint .", 
+    "lint": "eslint .",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit"
   },

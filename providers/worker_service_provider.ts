@@ -27,7 +27,6 @@ export default class WorkerServiceProvider {
       console.log('Migrations in progress. Workers will not be started.')
       return
     }
-
     console.log('Starting WorkerService...')
     await WorkerService.start()
   }

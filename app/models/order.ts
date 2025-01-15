@@ -8,7 +8,7 @@ export default class Order extends BaseModel {
   declare id: number
 
   @column()
-  declare orderId: string | undefined
+  declare orderId: string
 
   @column()
   declare symbol: string
