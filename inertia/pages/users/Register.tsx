@@ -122,7 +122,7 @@ export default function Register() {
 
           <p className="mt-4 text-center text-sm text-gray-600">
             Already have an account?{' '}
-            <a href="users/login" className="text-indigo-600 hover:text-indigo-500">
+            <a href="login" className="text-indigo-600 hover:text-indigo-500">
               Login
             </a>
           </p>
