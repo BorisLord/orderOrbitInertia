@@ -209,8 +209,10 @@ const CreateOrders = () => {
               <div className="text-gray-700">
                 {side === 'buy' ? (
                   <>
-                    You will receive approximately <strong>{quantity.toFixed(6)}</strong>{' '}
-                    {selectedSymbol.split('/')[0]}.
+                    You will receive approximately <strong>{amount}</strong>{' '}
+                    {selectedSymbol.split('/')[0]} for{' '}
+                    <strong>{(Number(price) * parseFloat(amount)).toFixed(4)}</strong>{' '}
+                    {selectedSymbol.split('/')[1]}.
                   </>
                 ) : (
                   <>

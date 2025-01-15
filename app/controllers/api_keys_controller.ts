@@ -19,7 +19,7 @@ export default class ApiKeysController {
       return inertia.render('users/Dashboard', { apiKeys })
     } catch (error) {
       console.log('Error in APIKEYCONTROLLER', error)
-      return response.badRequest({ message: 'Api Not Register' })
+      return response.badRequest({ message: 'Invalid Credential API' })
     }
   }
 

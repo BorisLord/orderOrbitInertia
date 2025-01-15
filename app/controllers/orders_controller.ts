@@ -94,7 +94,7 @@ export default class OrdersControllersController {
     await exchange.cancelOrder(exchangeOrderId, symbol)
     // console.log('cancelOrder (delete me)', cancelOrder)
 
-    return inertia.render('users/Orders')
+    return inertia.render('users/Dashboard')
   }
 
   public async createOrder({ auth, request, inertia }: HttpContext) {
@@ -134,6 +134,6 @@ export default class OrdersControllersController {
 
     console.log('res', res)
 
-    return inertia.render('users/OpenOrders')
+    return inertia.render('users/Dashboard')
   }
 }

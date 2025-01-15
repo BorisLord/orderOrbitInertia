@@ -25,18 +25,11 @@ const DashboardPage = () => {
   }
 
   const { user } = useUser()
-  // console.log('APIKEYINFRONT', apiKeys)
 
-  // console.log('EXCHGES', exchangesList)
-
-  // État pour gérer l'affichage du champ d'entrée
   const [isAddingKey, setIsAddingKey] = useState(false)
   const [newApiKey, setNewApiKey] = useState<ApiKeyPick>(initApiKey)
   const [message, setMessage] = useState('')
 
-  // console.log(newApiKey)
-
-  // Fonction pour gérer les changements des champs d'entrée
   const handleInputChange =
     (field: keyof ApiKeyPick) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       setNewApiKey((prev) => ({
@@ -52,7 +45,6 @@ const DashboardPage = () => {
     }
   }
 
-  // Gérer la soumission de la clé API
   const handleAddApiKey = async () => {
     if (!newApiKey) {
       setMessage('La clé API ne peut pas être vide.')
@@ -60,10 +52,10 @@ const DashboardPage = () => {
     }
     try {
       router.post('/addApiKey', newApiKey)
-      // console.log('APIKEYSENDED TO ZE MOON', newApiKey)
+
       setMessage('Clé API ajoutée avec succès.')
       setNewApiKey(initApiKey)
-      setIsAddingKey(false) // Masquer le champ
+      setIsAddingKey(false)
     } catch (error) {
       console.error('Erreur lors de l’ajout de la clé API:', error)
       setMessage('Erreur lors de l’ajout de la clé API.')
@@ -82,61 +74,65 @@ const DashboardPage = () => {
           <p className="text-lg">
             Your email: <span className="font-medium">{user?.email}</span>
           </p>
+          {apiKeys && apiKeys.length > 0 && (
+            <>
+              <button
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                onClick={() => router.get('/accounts')}
+              >
+                Check Accounts
+              </button>
+              <button
+                className="ml-4 mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                onClick={() => router.get('/openorders')}
+              >
+                Check Orders
+              </button>
+              <button
+                className="ml-4 mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                onClick={() => router.get('/createorders')}
+              >
+                Make Orders
+              </button>
 
-          <button
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            onClick={() => router.get('/accounts')}
-          >
-            Check Accounts
-          </button>
-
-          <button
-            className="ml-4 mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            onClick={() => router.get('/openorders')}
-          >
-            Check Orders
-          </button>
-
-          <button
-            className="ml-4 mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            onClick={() => router.get('/createorders')}
-          >
-            Make Orders
-          </button>
-
-          <h2 className="text-xl font-bold mt-6">Your API Keys</h2>
-          <table className="border-collapse border border-gray-300 w-full mt-4">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 px-4 py-2">Exchange</th>
-                <th className="border border-gray-300 px-4 py-2">Public API Key</th>
-                <th className="border border-gray-300 px-4 py-2">Add date</th>
-                <th className="border border-gray-300 px-4 py-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {apiKeys.map((key) => (
-                <tr key={key.exchangeId} className="hover:bg-gray-50">
-                  <td className="border border-gray-300 px-4 py-2">{key.exchangeId}</td>
-                  <td className="border border-gray-300 px-4 py-2">
-                    {key.apiKey.slice(0, 6)} **** {key.apiKey.slice(-6)}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2">{formatDate(key.createdAt)}</td>
-                  <td className="border border-gray-300 px-4 py-2 text-center">
-                    <button
-                      onClick={() => handleDelete(key.id)}
-                      className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                    >
-                      Delete Key
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              <h2 className="text-xl font-bold mt-6">Your API Keys</h2>
+              <table className="border-collapse border border-gray-300 w-full mt-4">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="border border-gray-300 px-4 py-2">Exchange</th>
+                    <th className="border border-gray-300 px-4 py-2">Public API Key</th>
+                    <th className="border border-gray-300 px-4 py-2">Add date</th>
+                    <th className="border border-gray-300 px-4 py-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {apiKeys.map((key) => (
+                    <tr key={key.exchangeId} className="hover:bg-gray-50">
+                      <td className="border border-gray-300 px-4 py-2">{key.exchangeId}</td>
+                      <td className="border border-gray-300 px-4 py-2">
+                        {key.apiKey.slice(0, 6)} **** {key.apiKey.slice(-6)}
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2">
+                        {formatDate(key.createdAt)}
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2 text-center">
+                        <button
+                          onClick={() => handleDelete(key.id)}
+                          className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                        >
+                          Delete Key
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          )}
           {/* Gestion des clés API */}
+
           <div className="mt-6">
-            <h2 className="text-xl font-bold">Manage API Keys</h2>
+            <h2 className="text-xl font-bold">Add API Keys</h2>
 
             {isAddingKey ? (
               <form
@@ -204,7 +200,7 @@ const DashboardPage = () => {
                     className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-10"
                     onClick={() => {
                       setIsAddingKey(false)
-                      setNewApiKey(initApiKey) // Réinitialise les champs
+                      setNewApiKey(initApiKey)
                     }}
                   >
                     Cancel

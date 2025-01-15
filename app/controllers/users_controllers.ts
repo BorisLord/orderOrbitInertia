@@ -19,10 +19,10 @@ export default class UsersController {
       await UserService.createUser(data)
 
       session.flash({ success: 'Registration successful!' })
-      return response.redirect('/')
+      return response.redirect('/users/login')
     } catch (error) {
       session.flash({ errors: error.messages })
-      return response.redirect('back')
+      return response.redirect('/')
     }
   }
 
@@ -36,7 +36,9 @@ export default class UsersController {
       response.redirect('users/dashboard')
     } catch (error) {
       console.log(error)
-      return response.badRequest({ message: 'Invalid credentials' })
+      return response.badRequest({
+        message: 'Invalid credentials.',
+      })
     }
   }
 
