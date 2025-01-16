@@ -43,15 +43,12 @@ export default class ApiKey extends BaseModel {
   @belongsTo(() => User)
   public user!: BelongsTo<typeof User>
 
-  // Hook pour hasher secret et password avant de sauvegarder
   @beforeSave()
   static async hashSensitiveData(apiKey: ApiKey) {
-    // Encrypt `secret` si modifié
     if (apiKey.$dirty.secret) {
       apiKey.secret = encryption.encrypt(apiKey.secret)
     }
 
-    // Encrypt `password` si modifié
     if (apiKey.password) {
       if (apiKey.$dirty.password) {
         apiKey.password = encryption.encrypt(apiKey.password)
@@ -59,7 +56,6 @@ export default class ApiKey extends BaseModel {
     }
   }
 
-  // Hook pour enregistrer les suppressions
   @beforeDelete()
   static async logDeletion(apiKey: ApiKey) {
     await ApiKeyAudit.create({
@@ -69,7 +65,6 @@ export default class ApiKey extends BaseModel {
     })
   }
 
-  // Hook pour enregistrer les créations
   @afterCreate()
   static async logCreation(apiKey: ApiKey) {
     await ApiKeyAudit.create({
