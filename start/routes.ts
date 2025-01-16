@@ -21,6 +21,18 @@ router.get('/', async ({ inertia }) => {
   return inertia.render('Home')
 })
 
+router.get('/Terms', async ({ inertia }) => {
+  return inertia.render('Terms')
+})
+
+router.get('/Privacy', async ({ inertia }) => {
+  return inertia.render('Privacy')
+})
+
+router.get('/Contact', async ({ inertia }) => {
+  return inertia.render('Contact')
+})
+
 router.get('users/register', async ({ inertia }) => {
   return inertia.render('users/Register')
 })
